@@ -13,7 +13,7 @@ class MoviesSlideshow extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
 
     return SizedBox(
-      height: 210,
+      height: 600,
       width: double.infinity,
       child: Swiper(
         autoplay: true,
@@ -22,6 +22,8 @@ class MoviesSlideshow extends StatelessWidget {
           builder: DotSwiperPaginationBuilder(
             color: colors.secondary,
             activeColor: colors.primary,
+            activeSize: 15,
+            space: 5,
           ),
         ),
         viewportFraction: 0.8,
@@ -40,6 +42,7 @@ class _Slide extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Variables
     final decoration = BoxDecoration(
       borderRadius: BorderRadius.circular(20),
       boxShadow: const [
@@ -51,6 +54,7 @@ class _Slide extends StatelessWidget {
       ],
     );
 
+    // Return
     return Padding(
       padding: const EdgeInsets.only(bottom: 30),
       child: DecoratedBox(
@@ -58,7 +62,7 @@ class _Slide extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: Image.network(
-            movie.backdropPath,
+            movie.posterPath,
             fit: BoxFit.cover,
             loadingBuilder: (context, child, loadingProgress) {
               if (loadingProgress != null) {
