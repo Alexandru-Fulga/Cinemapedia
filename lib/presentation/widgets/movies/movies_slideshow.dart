@@ -13,7 +13,7 @@ class MoviesSlideshow extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
 
     return SizedBox(
-      height: 600,
+      height: 500,
       width: double.infinity,
       child: Swiper(
         autoplay: true,

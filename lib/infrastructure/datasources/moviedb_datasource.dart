@@ -5,6 +5,8 @@ import 'package:cinemapedia/infrastructure/mappers/movie_mapper.dart';
 import 'package:cinemapedia/infrastructure/models/moviedb/moviedb_response.dart';
 import 'package:dio/dio.dart';
 
+import '../models/moviedb/movie_details.dart';
+
 class MoviedbDatasource extends MoviesDatasource {
   final dio = Dio(
     BaseOptions(
@@ -16,11 +18,8 @@ class MoviedbDatasource extends MoviesDatasource {
     ),
   );
 
-  Future<List<Movie>> _getMovieEntities(
-      {required String url, int page = 1}) async {
-    final response = await dio.get(url, queryParameters: {'page': page});
-
-    final movieDBResponse = MovieDbResponse.fromJson(response.data);
+  Future<List<Movie>> _jsonToMovies(Map<String, dynamic> json) async {
+    final movieDBResponse = MovieDbResponse.fromJson(json);
 
     final List<Movie> moviesList = movieDBResponse.results
         .where((moviedb) => moviedb.posterPath != 'no-poster')
@@ -31,18 +30,49 @@ class MoviedbDatasource extends MoviesDatasource {
   }
 
   @override
-  Future<List<Movie>> getNowPlaying({int page = 1}) async =>
-      await _getMovieEntities(url: '/movie/now_playing', page: page);
+  Future<List<Movie>> getNowPlaying({int page = 1}) async {
+    final response =
+        await dio.get('/movie/now_playing', queryParameters: {'page': page});
+
+    return _jsonToMovies(response.data);
+  }
 
   @override
-  Future<List<Movie>> getPopular({int page = 1}) async =>
-      await _getMovieEntities(url: '/movie/popular', page: page);
+  Future<List<Movie>> getPopular({int page = 1}) async {
+    final response =
+        await dio.get('/movie/popular', queryParameters: {'page': page});
+
+    return _jsonToMovies(response.data);
+  }
 
   @override
-  Future<List<Movie>> getTopRated({int page = 1}) async =>
-      await _getMovieEntities(url: '/movie/top_rated', page: page);
+  Future<List<Movie>> getTopRated({int page = 1}) async {
+    final response =
+        await dio.get('/movie/top_rated', queryParameters: {'page': page});
+
+    return _jsonToMovies(response.data);
+  }
 
   @override
-  Future<List<Movie>> getUpcoming({int page = 1}) async =>
-      await _getMovieEntities(url: '/movie/upcoming', page: page);
+  Future<List<Movie>> getUpcoming({int page = 1}) async {
+    final response =
+        await dio.get('/movie/upcoming', queryParameters: {'page': page});
+
+    return _jsonToMovies(response.data);
+  }
+
+  @override
+  Future<Movie> getMovieById(String id) async {
+    final response = await dio.get('/movie/$id');
+
+    if (response.statusCode != 200) {
+      throw Exception('Movie with id: $id not found');
+    }
+
+    final movieDB = MovieDetails.fromJson(response.data);
+
+    final Movie movie = MovieMapper.movieDetailsToEntity(movieDB);
+
+    return movie;
+  }
 }
